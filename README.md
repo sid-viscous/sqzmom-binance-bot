@@ -4,6 +4,8 @@ A crypto trading bot based on Lazybear's squeeze momentum (SQZMOM) strategy.
 
 It trades on the Binance exchange.
 
+This bot does not yet work, it s still in initial development.
+
 ## Configuration
 
 Make a copy of `settings.cfg.example` and call it `settings.cfg`. 
