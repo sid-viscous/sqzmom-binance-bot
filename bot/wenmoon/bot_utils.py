@@ -42,10 +42,10 @@ def format_historical_kline(kline):
     https://github.com/binance/binance-public-data/#klines
 
     Args:
-        kline (list of str): Raw kline data
+        kline (list of str): Raw kline data.
 
     Returns:
-
+        dict: Human readable kline data.
     """
     return {
         "kline_start_time_ms": kline[0],

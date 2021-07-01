@@ -27,7 +27,10 @@ class Bot:
             binance_client: An instance of the binance client, used for getting historic data and submitting orders.
             candles (list of dict): The most recent list of closed historic candles.
             strategy (class): The class definition for the chosen strategy.
-            position (str): The current position for the strategy (options: "long", "short")
+            position (str): The current position for the strategy (options: "long", "short").
+            coin_balance (float): The balance of coin currently trading.
+            fiat_balance (float): The balance of fiat currency currently trading.
+            newest_kline (dict): The most recent kline from the websocket.
         """
         self.config = config
         self.websocket = ThreadedWebsocketManager()
@@ -36,6 +39,9 @@ class Bot:
         self.candles = None
         self.strategy = strategy
         self.position = config.start_position
+        self.coin_balance = None
+        self.fiat_balance = None
+        self.newest_kline = None
 
     def login(self):
         """Logs into the binance client API using the supplied api key and secret."""
@@ -82,6 +88,10 @@ class Bot:
 
         """
         kline = format_websocket_result(msg)
+
+        # Store the recent kline
+        self.newest_kline = kline
+
         if kline["event_type"] == "error":
             # On error, close and restart the websocket
             print("Error: websocket connection issue")
@@ -141,6 +151,69 @@ class Bot:
         except:
             print("Error: cannot stop connection to websocket")
 
+    def check_balance(self):
+        """Checks the starting balance is available in the spot wallet.
+
+        For test mode, this always returns the instance variable self.
+
+        Returns:
+
+        """
+        if self.config.test_mode:
+            return True
+        else:
+            pass
+
+    def fake_buy(self):
+        """Simulates a buy order.
+
+        Takes into account the current price and modifies the balances on the Bot instance.
+
+        """
+        # Get current price
+        price = self.newest_kline["close_price"]
+
+        # Calculate coin buy quantity with current funds
+        coin_buy_quantity = price/self.fiat_balance
+
+        # Make the fake purchase
+        self.fiat_balance = 0
+        self.coin_balance = coin_buy_quantity
+
+    def fake_sell(self):
+        """Simulates a sell order.
+
+        Takes into account the current price and modifies the balances on the Bot instance.
+
+        """
+        # Get current price
+        price = self.newest_kline["close_price"]
+
+        # Calculate fiat buy quantity with current funds
+        fiat_buy_quantity = price*self.coin_balance
+
+        # Make the fake sell
+        self.coin_balance = 0
+        self.fiat_balance = fiat_buy_quantity
+
+
+    def enter_long_position(self):
+        """Function triggered when a long position is requested by the strategy
+
+        Currently operates in test mode only.
+
+        """
+        if self.config.test_mode:
+            self.fake_buy()
+
+    def enter_short_position(self):
+        """Function triggered when a short position is requested by the strategy
+
+        Currently operates in test mode only.
+
+        """
+        if self.config.test_mode:
+            self.fake_sell()
 
 
 

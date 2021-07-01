@@ -1,10 +1,13 @@
-from wenmoon.strategies.strategy_utils import f_ema, f_macd, get_kline_values_as_list
+from wenmoon.strategies.strategy_utils import f_ema, f_macd, f_atr, f_ohlc4, get_kline_values_as_list
 
 # Parameters
 EMA_WINDOW = 10
-MACD_WINDOW_SLOW = 26
+MACD_WINDOW_SLOW = 27
 MACD_WINDOW_FAST = 12
-MACD_WINDOW_SIGNAL = 9
+MACD_WINDOW_SIGNAL = 7
+ATR_WINDOW = 20
+ATR_MULTIPLIER = 2.0
+
 
 class Strategy:
 
@@ -27,16 +30,46 @@ class Strategy:
         high_prices = get_kline_values_as_list(historical_klines, "high_price")
         low_prices = get_kline_values_as_list(historical_klines, "low_price")
 
+
+
+        # Get indicators
+        macd = f_macd(close_prices, MACD_WINDOW_SLOW, MACD_WINDOW_FAST, MACD_WINDOW_SIGNAL)
+        atr = f_atr(high_prices, low_prices, close_prices, ATR_WINDOW, ATR_MULTIPLIER)
+        ohlc4 = f_ohlc4(open_prices, high_prices, low_prices, close_prices, ATR_WINDOW)
+
+        # Chandelier exit
+        long_stop = max(ohlc4) - atr[-1]
+        short_stop = min(ohlc4) + atr[-1]
+
         # Useful for dumping data into excel for testing
         # print("+++++++++++++")
         # print("Open High Low Close")
         # for i in range(len(close_prices)):
         #     print(f"{open_prices[i]} {high_prices[i]} {low_prices[i]} {close_prices[i]}")
         # print("--------------")
-        # Get indicators
-        ema = f_ema(close_prices, EMA_WINDOW)
-        macd = f_macd(close_prices, MACD_WINDOW_SLOW, MACD_WINDOW_FAST, MACD_WINDOW_SIGNAL)
+        #
+        # print("MACD_HIST")
+        # for p in macd:
+        #     print(p)
+        #
+        # print("ATR")
+        # for p in atr:
+        #     print(p)
+        #
+        # print("OHLC4")
+        # for p in ohlc4:
+        #     print(p)
+        #
+        # print("long_stop")
+        # print(long_stop)
+        #
+        # print("short_stop")
+        # print(short_stop)
 
+
+
+
+        # TODO: Replace this with actual strategy
         position = "long"
 
         return position
