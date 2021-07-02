@@ -10,11 +10,13 @@ fiat_symbol=USDT
 watch_pair_symbol=BTCUSDT
 # Inverval options: 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 12h
 interval=1m
-# Starting position (coin or fiat)
-start_position=fiat
-# Maximum number of candles to store
-max_candles=100
+# Starting position (short or long)
+start_position=short
+# Starting balance (for fiat or coin, whatever is specified in start_position)
+start_balance=100
 # Test mode (play with fake balance, no real purchases, options: yes, no)
 test_mode=yes
+# Maximum number of candles to store
+max_candles=100
 # Strategy (options: wenmoon)
 strategy=wenmoon

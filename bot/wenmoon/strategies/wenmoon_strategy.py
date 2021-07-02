@@ -11,18 +11,21 @@ ATR_MULTIPLIER = 2.0
 
 class Strategy:
 
-    @staticmethod
-    def scout(historical_klines, current_kline):
+    def __init__(self):
+        self.long_stop_prev = None
+        self.short_stop_prev = None
+
+    def scout(self, historical_klines, current_kline):
         """Strategy function should be stored in scout function.
          It should return the string 'long' or 'short'.
-         Strings have been used here in case future strategies have multiple positions.
+         Strings have been used here in case future strategies have more positions.
 
         Args:
             historical_klines (list of dict): Historical market klines (candles) for the selected trading symbol
             current_kline (dict): The most up to date kline from the websocket (may not be closed)
 
         Returns:
-            string: The position chosen by the strategy (options: "long" or "short")
+            string: The position chosen by the strategy (options: "long", "short", "neutral")
         """
         # Get required candles, EMA and MACD require close price, and ATR requires open, high, low, close prices
         close_prices = get_kline_values_as_list(historical_klines, "close_price")
@@ -30,16 +33,37 @@ class Strategy:
         high_prices = get_kline_values_as_list(historical_klines, "high_price")
         low_prices = get_kline_values_as_list(historical_klines, "low_price")
 
-
-
         # Get indicators
-        macd = f_macd(close_prices, MACD_WINDOW_SLOW, MACD_WINDOW_FAST, MACD_WINDOW_SIGNAL)
+        macd_hist = f_macd(close_prices, MACD_WINDOW_SLOW, MACD_WINDOW_FAST, MACD_WINDOW_SIGNAL)
         atr = f_atr(high_prices, low_prices, close_prices, ATR_WINDOW, ATR_MULTIPLIER)
         ohlc4 = f_ohlc4(open_prices, high_prices, low_prices, close_prices, ATR_WINDOW)
 
         # Chandelier exit
         long_stop = max(ohlc4) - atr[-1]
         short_stop = min(ohlc4) + atr[-1]
+
+        # For the first iteration, set the previous long stop
+        if not self.long_stop_prev:
+            self.long_stop_prev = long_stop
+
+        if close_prices[-2] > self.long_stop_prev:
+            long_stop = max(long_stop, self.long_stop_prev)
+
+        # For the first iteration, set the previous short stop
+        if not self.short_stop_prev:
+            self.short_stop_prev = short_stop
+
+        if ohlc4[-2] < self.short_stop_prev:
+            short_stop = min(short_stop, self.short_stop_prev)
+
+        if macd_hist[-1] > 0:
+            position = "long"
+        elif macd_hist[-1] < 0:
+            position = "short"
+        else:
+            position = "neutral"
+
+
 
         # Useful for dumping data into excel for testing
         # print("+++++++++++++")
@@ -69,7 +93,15 @@ class Strategy:
 
 
 
-        # TODO: Replace this with actual strategy
-        position = "long"
+        print(f"macd_hist = {macd_hist[-1]}")
+        print(f"long_stop_prev = {self.long_stop_prev}")
+        print(f"short_stop_prev = {self.short_stop_prev}")
+        print(f"long_stop = {long_stop}")
+        print(f"short_stop = {short_stop}")
+        print(f"recommended position = {position}")
+
+        # Set the stop values for next iteration
+        self.long_stop_prev = long_stop
+        self.short_stop_prev = short_stop
 
         return position

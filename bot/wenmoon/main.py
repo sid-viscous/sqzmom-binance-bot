@@ -2,9 +2,12 @@ import time
 import sys
 import signal
 import threading
+
+import wenmoon
 from wenmoon.Config import Config
 from wenmoon.Bot import Bot
 from wenmoon.strategies import get_strategy
+from wenmoon.strategies.wenmoon_strategy import Strategy
 
 
 
@@ -14,7 +17,11 @@ def main():
     config = Config()
 
     # Get the strategy to be used
-    strategy = get_strategy(config.strategy)
+    # strategy = get_strategy(config.strategy)
+
+    strategy = Strategy()
+    # strategy.scout("1", "2")
+    # print(strategy)
 
     # Initialise bot
     bot = Bot(config, strategy)

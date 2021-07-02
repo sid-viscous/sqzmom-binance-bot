@@ -40,11 +40,12 @@ class Config:
         self.interval_number = int(re.search(r"\d+", self.interval)[0])
         self.interval_unit = re.search(r"\D+", self.interval)[0]
         self.start_position = config.get(CONFIG_SECTION, "start_position")
+        self.start_balance = config.getfloat(CONFIG_SECTION, "start_balance")
         self.max_candles = config.getint(CONFIG_SECTION, "max_candles")
         self.test_mode = config.getboolean(CONFIG_SECTION, "test_mode")
         self.strategy = config.get(CONFIG_SECTION, "strategy")
-        self.output_klines = True
-        self.output_websocket = True
+        self.output_klines = False
+        self.output_websocket = False
 
     @staticmethod
     def _validate_interval(interval):

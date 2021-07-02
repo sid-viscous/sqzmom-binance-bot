@@ -42,6 +42,7 @@ class Bot:
         self.coin_balance = None
         self.fiat_balance = None
         self.newest_kline = None
+        self.set_initial_balance()
 
     def login(self):
         """Logs into the binance client API using the supplied api key and secret."""
@@ -107,21 +108,29 @@ class Bot:
                         print(candle)
                         # print("To stop candles output, enter 'c'")
 
-                    # ==============================================================
-                    # DECISION TIME
-                    # ==============================================================
-                    print(f"Checking strategy for position - current position: {self.position}")
-                    new_position = self.strategy.scout(self.candles, kline)
-                    # Check if position has changed
-                    if new_position != self.position:
-                        if new_position == "long":
-                            self.position = "long"
-                        else:
-                            print("Going short")
-                            self.position = "short"
-                        print(f"Position changed, new position: {self.position}")
+                # ==============================================================
+                # DECISION TIME
+                # ==============================================================
+                print("-----------------------------------------------------------------------------------------------")
+                print(f"Checking strategy for position - current position: {self.position}")
+                recommended_position = self.strategy.scout(self.candles, kline)
 
-                    # ==============================================================
+                # Check if position has changed
+                if recommended_position != self.position:
+                    if recommended_position == "long":
+                        print("Going long")
+                        self.position = "long"
+                        self.enter_long_position()
+                    elif recommended_position == "short":
+                        print("Going short")
+                        self.position = "short"
+                        self.enter_short_position()
+                    else:
+                        print(f"recommended position neutral, stay in current position: {self.position}")
+
+                self.output_balances()
+
+                # ==============================================================
 
             if self.config.output_websocket:
                 print(kline)
@@ -151,34 +160,46 @@ class Bot:
         except:
             print("Error: cannot stop connection to websocket")
 
-    def check_balance(self):
-        """Checks the starting balance is available in the spot wallet.
+    def set_initial_balance(self):
+        """Checks the starting coin balance is available in the spot wallet.
 
-        For test mode, this always returns the instance variable self.
-
-        Returns:
-
+        For test mode, no verifications take place on the balance.
         """
         if self.config.test_mode:
-            return True
+            if self.config.start_position == "long":
+                self.coin_balance = self.config.start_balance
+            else:
+                self.fiat_balance = self.config.start_balance
         else:
             pass
+
+    def output_balances(self):
+        """Gets the current coin and fiat balances and prints them to the console"""
+        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+        print(f"Coin balance: {self.coin_balance} {self.config.coin_symbol}")
+        print(f"Fiat balance: {self.fiat_balance} {self.config.fiat_symbol}")
+        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 
     def fake_buy(self):
         """Simulates a buy order.
 
         Takes into account the current price and modifies the balances on the Bot instance.
 
+        TODO: Take into account trading fees for fake buys and sells
+
         """
         # Get current price
         price = self.newest_kline["close_price"]
 
         # Calculate coin buy quantity with current funds
-        coin_buy_quantity = price/self.fiat_balance
+        coin_buy_quantity = self.fiat_balance/price
 
         # Make the fake purchase
         self.fiat_balance = 0
         self.coin_balance = coin_buy_quantity
+
+        # Output message
+        print(f"Bought {coin_buy_quantity} {self.config.fiat_symbol} at price of {price} {self.config.fiat_symbol}")
 
     def fake_sell(self):
         """Simulates a sell order.
@@ -196,11 +217,13 @@ class Bot:
         self.coin_balance = 0
         self.fiat_balance = fiat_buy_quantity
 
+        # Output message
+        print(f"Sold {self.config.coin_symbol} at price of {price} {self.config.fiat_symbol} for {fiat_buy_quantity} {self.config.fiat_symbol}")
 
     def enter_long_position(self):
         """Function triggered when a long position is requested by the strategy
 
-        Currently operates in test mode only.
+        TODO: Currently operates in test mode only, write real buy code
 
         """
         if self.config.test_mode:
@@ -209,7 +232,7 @@ class Bot:
     def enter_short_position(self):
         """Function triggered when a short position is requested by the strategy
 
-        Currently operates in test mode only.
+        TODO: Currently operates in test mode only, write real sell code
 
         """
         if self.config.test_mode:
