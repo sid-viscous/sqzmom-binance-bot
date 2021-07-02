@@ -46,6 +46,7 @@ class Config:
         self.strategy = config.get(CONFIG_SECTION, "strategy")
         self.output_klines = False
         self.output_websocket = False
+        self.run_mode = os.getenv("RUN_MODE", "python")
 
     @staticmethod
     def _validate_interval(interval):

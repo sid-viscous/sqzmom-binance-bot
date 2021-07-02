@@ -10,4 +10,7 @@ RUN pip install -r requirements.txt
 
 COPY wenmoon wenmoon
 
+ENV RUN_MODE=docker
+ENV PYTHONUNBUFFERED=1
+
 CMD ["python", "-m", "wenmoon"]

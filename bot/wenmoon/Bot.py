@@ -126,6 +126,7 @@ class Bot:
                         self.position = "short"
                         self.enter_short_position()
                     else:
+                        # In the almost impossible scenario where the indicator ends on a neutral position, do nothing
                         print(f"recommended position neutral, stay in current position: {self.position}")
 
                 self.output_balances()
@@ -174,7 +175,10 @@ class Bot:
             pass
 
     def output_balances(self):
-        """Gets the current coin and fiat balances and prints them to the console"""
+        """Gets the current coin and fiat balances and prints them to the console.
+
+        TODO: Output fiat value of coin balance when in long position.
+        """
         print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
         print(f"Coin balance: {self.coin_balance} {self.config.coin_symbol}")
         print(f"Fiat balance: {self.fiat_balance} {self.config.fiat_symbol}")
@@ -199,7 +203,7 @@ class Bot:
         self.coin_balance = coin_buy_quantity
 
         # Output message
-        print(f"Bought {coin_buy_quantity} {self.config.fiat_symbol} at price of {price} {self.config.fiat_symbol}")
+        print(f"Bought {coin_buy_quantity} {self.config.coin_symbol} at price of {price} {self.config.fiat_symbol}")
 
     def fake_sell(self):
         """Simulates a sell order.
