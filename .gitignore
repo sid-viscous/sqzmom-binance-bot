@@ -134,3 +134,4 @@ dmypy.json
 bot/wenmoon/settings.cfg
 ./settings.cfg
 *.cfg
+playground/
