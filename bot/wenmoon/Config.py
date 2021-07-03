@@ -43,6 +43,7 @@ class Config:
         self.start_balance = config.getfloat(CONFIG_SECTION, "start_balance")
         self.max_candles = config.getint(CONFIG_SECTION, "max_candles")
         self.test_mode = config.getboolean(CONFIG_SECTION, "test_mode")
+        self.test_fee = config.getfloat(CONFIG_SECTION, "test_fee")
         self.strategy = config.get(CONFIG_SECTION, "strategy")
         self.output_klines = False
         self.output_websocket = False

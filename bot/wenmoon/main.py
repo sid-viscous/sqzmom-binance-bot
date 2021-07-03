@@ -70,5 +70,6 @@ def main():
             else:
                 print('Unknown option.')
         else:
+            # When running in Docker, don't ask for user input
             pass
 

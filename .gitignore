@@ -132,3 +132,5 @@ dmypy.json
 
 # Project specific
 bot/wenmoon/settings.cfg
+./settings.cfg
+*.cfg

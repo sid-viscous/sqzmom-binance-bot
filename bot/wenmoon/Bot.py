@@ -39,8 +39,8 @@ class Bot:
         self.candles = None
         self.strategy = strategy
         self.position = config.start_position
-        self.coin_balance = None
-        self.fiat_balance = None
+        self.coin_balance = 0
+        self.fiat_balance = 0
         self.newest_kline = None
         self.set_initial_balance()
 
@@ -102,9 +102,11 @@ class Bot:
             # For normal messages
             if kline["is_kline_closed"]:
                 # Update historical klines
-                self.get_historical_klines()
-                for candle in self.candles:
-                    if self.config.output_websocket:
+                self.add_new_kline(kline)
+
+                # Print the candle data if requested in the config
+                if self.config.output_websocket:
+                    for candle in self.candles:
                         print(candle)
                         # print("To stop candles output, enter 'c'")
 
@@ -174,14 +176,36 @@ class Bot:
         else:
             pass
 
+    def add_new_kline(self, kline):
+        """Adds the newest kline from the websocket and deletes the oldest one.
+
+        The formats for the historical klines and websocket klines are slightly different, however the OHLC is
+        the same for both.
+
+        Args:
+            kline (dict): Human readable candle data.
+        """
+        # Add the new candle
+        self.candles.append(kline)
+
+        # Remove the first item
+        self.candles.pop(0)
+
     def output_balances(self):
         """Gets the current coin and fiat balances and prints them to the console.
 
-        TODO: Output fiat value of coin balance when in long position.
+        Outputs fiat value of coin balance when in long position.
         """
+
+        # Calculate the fiat value of the coin balance
+        fiat_value = self.coin_balance*self.newest_kline["close_price"]
+
+        # Calculate the coin value of the fiat balance
+        coin_value = self.fiat_balance/self.newest_kline["close_price"]
+
         print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-        print(f"Coin balance: {self.coin_balance} {self.config.coin_symbol}")
-        print(f"Fiat balance: {self.fiat_balance} {self.config.fiat_symbol}")
+        print(f"Coin balance: {self.coin_balance} {self.config.coin_symbol} ({fiat_value} {self.config.fiat_symbol})")
+        print(f"Fiat balance: {self.fiat_balance} {self.config.fiat_symbol} ({coin_value} {self.config.coin_symbol})")
         print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 
     def fake_buy(self):
@@ -197,6 +221,9 @@ class Bot:
 
         # Calculate coin buy quantity with current funds
         coin_buy_quantity = self.fiat_balance/price
+
+        # Subtract trading fee
+        coin_buy_quantity *= 1 - self.config.test_fee/100
 
         # Make the fake purchase
         self.fiat_balance = 0
@@ -216,6 +243,9 @@ class Bot:
 
         # Calculate fiat buy quantity with current funds
         fiat_buy_quantity = price*self.coin_balance
+
+        # Subtract trading fee
+        fiat_buy_quantity *= 1 - self.config.test_fee / 100
 
         # Make the fake sell
         self.coin_balance = 0

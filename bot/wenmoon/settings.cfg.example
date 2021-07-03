@@ -16,6 +16,8 @@ start_position=short
 start_balance=100
 # Test mode (play with fake balance, no real purchases, options: yes, no)
 test_mode=yes
+# Trading fees for test mode in percentage (0.1 represents 0.1%)
+test_fees=0.1
 # Maximum number of candles to store
 max_candles=100
 # Strategy (options: wenmoon)
