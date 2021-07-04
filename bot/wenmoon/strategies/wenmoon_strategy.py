@@ -15,14 +15,13 @@ class Strategy:
         self.long_stop_prev = None
         self.short_stop_prev = None
 
-    def scout(self, historical_klines, current_kline):
+    def scout(self, historical_klines):
         """Strategy function should be stored in scout function.
          It should return the string 'long' or 'short'.
          Strings have been used here in case future strategies have more positions.
 
         Args:
             historical_klines (list of dict): Historical market klines (candles) for the selected trading symbol
-            current_kline (dict): The most up to date kline from the websocket (may not be closed)
 
         Returns:
             string: The position chosen by the strategy (options: "long", "short", "neutral")
