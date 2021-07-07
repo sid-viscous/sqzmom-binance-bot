@@ -1,10 +1,24 @@
-import numpy as np
-from binance import Client, ThreadedWebsocketManager
+import json
+from binance import Client
 from wenmoon.bot_utils import format_websocket_result, format_historical_klines, calculate_start_date
 from wenmoon.Trader import Trader
 
 
 class Bot:
+    """Main engine for handling market data.
+
+    Stores the candle data and queries the Trader class for the recommended position.
+
+    Attributes:
+        config: An instance of the configuration class, which should already be initialised.
+        websocket: An instance of the threaded websocket connection manager.
+        binance_client: An instance of the binance client, used for getting historic data and submitting orders.
+        candles (list of dict): The most recent list of closed historic candles.
+        strategy (class): The class definition for the chosen strategy.
+        newest_kline (dict): The most recent kline from the websocket.
+        trader (Trader): Instance of the trader class.
+    """
+
     def __init__(self, config, strategy):
         """Initialise the bot.
 
@@ -13,30 +27,25 @@ class Bot:
 
         It also feeds this data to the Trader object, where a decision is made on the current position.
 
+        When the Bot is initialised, it is logged in using the API credentials, and historical candle data is requested.
+
         Note: Requests made to the normal binance api are subject to limits, websockets are not limited.
 
         Args:
             config: An instance of the configuration class, which should already be initialised.
             strategy: A class definition for the strategy to be used.
 
-        Attributes:
-            config: An instance of the configuration class, which should already be initialised.
-            websocket: An instance of the threaded websocket connection manager.
-            websocket_key: The key for the websocket thread.
-            binance_client: An instance of the binance client, used for getting historic data and submitting orders.
-            candles (list of dict): The most recent list of closed historic candles.
-            strategy (class): The class definition for the chosen strategy.
-            newest_kline (dict): The most recent kline from the websocket.
-            trader (Trader): Instance of the trader class.
         """
         self.config = config
-        self.websocket = ThreadedWebsocketManager()
-        self.websocket_key = None
+        # self.websocket = self.init_kline_websocket()
+        # self.websocket_key = None
         self.binance_client = None
         self.candles = None
         self.strategy = strategy
         self.newest_kline = None
         self.trader = Trader(config, strategy)
+        self.login()
+        self.get_historical_klines()
 
     def login(self):
         """Logs into the binance client API using the supplied api key and secret."""
@@ -53,6 +62,7 @@ class Bot:
         The documentation for the returned kline data at this endpoint can be found at the following link:
         https://github.com/binance/binance-public-data/#klines
         """
+        print("Getting candle data")
         # Calculate time to query for
         start_time = calculate_start_date(
             self.config.interval_number * self.config.max_candles,
@@ -82,7 +92,8 @@ class Bot:
             msg (dict): A dictionary containing the kline data
 
         """
-        kline = format_websocket_result(msg)
+
+        kline = format_websocket_result(json.loads(msg))
 
         # Store the recent kline
         self.newest_kline = kline
@@ -90,8 +101,6 @@ class Bot:
         if kline["event_type"] == "error":
             # On error, close and restart the websocket
             print("Error: websocket connection issue")
-            self.stop_kline_websocket()
-            self.start_kline_websocket()
         else:
             # For normal messages
             if kline["is_kline_closed"]:
@@ -105,36 +114,25 @@ class Bot:
                         # print("To stop candles output, enter 'c'")
 
                 # Give the trader the new candle data and take action if required
-                self.trader.handle_new_kline(self.candles)
+                self.trader.set_position(self.candles)
 
 
             if self.config.output_websocket:
                 print(kline)
                 # print("To stop the websocket output, enter 'w'")
 
-    def start_kline_websocket(self):
-        """Starts the websocket connection.
+    def start(self):
+        """This function is called whenever the websocket connection starts.
 
-        The instance of the websocket manager, and the key to its thread are stored as instance variables.
-
-        The callback function for when a websocket message is received is also specified here.
+        A start can happen at the initial running of the bot, or after an error.
         """
-        print(f"Starting websocket connection, watching symbol {self.config.watch_symbol_pair}")
-        try:
-            self.websocket.start()
-            self.websocket_key = self.websocket.start_kline_socket(
-                callback=self.handle_websocket_message,
-                symbol=self.config.watch_symbol_pair
-            )
-        except:
-            print("Error: cannot connect to websocket")
 
-    def stop_kline_websocket(self):
-        """Ends the connection to the websocket."""
-        try:
-            self.websocket.stop()
-        except:
-            print("Error: cannot stop connection to websocket")
+        # Delete old candle data (we might be missing a few) and get historical candles
+        self.candles = []
+        self.get_historical_klines()
+
+        # Ensure we are in the correct position (in the case of a restart we might have missed a buy/sell signal)
+        self.trader.set_position(self.candles)
 
     def add_new_kline(self, kline):
         """Adds the newest kline from the websocket and deletes the oldest one.

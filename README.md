@@ -22,7 +22,7 @@ In a terminal, navigate to the `bot` folder and run the command.
 python -m wenmoon
 ```
 
-Sometimes killing the bot is difficult, so closing the terminal session may be necessary. You can try using CTRL+C
+To close the bot when running in Python, use CTRL+C twice.
 
 ### In Docker
 

@@ -1,5 +1,6 @@
 from datetime import datetime, timezone, timedelta
 
+
 def format_websocket_result(msg):
     """Rewrites the message from the websocket into a more readable format.
 
@@ -35,6 +36,7 @@ def format_websocket_result(msg):
         "taker_buy_quote_asset_volume": float(msg["k"]["Q"])
     }
 
+
 def format_historical_kline(kline):
     """Rewrites a kline into a more readable format.
 
@@ -48,20 +50,21 @@ def format_historical_kline(kline):
         dict: Human readable kline data.
     """
     return {
-        "kline_start_time_ms": kline[0],
-        "kline_start_time": str(datetime.fromtimestamp(kline[0]/1000, tz=timezone.utc)),
+        "kline_start_time_ms": int(kline[0]),
+        "kline_start_time": str(datetime.fromtimestamp(int(kline[0])/1000, tz=timezone.utc)),
         "open_price": float(kline[1]),
         "high_price": float(kline[2]),
         "low_price": float(kline[3]),
         "close_price": float(kline[4]),
         "volume": float(kline[5]),
         "kline_close_time_ms": int(kline[6]),
-        "kline_close_time": str(datetime.fromtimestamp(kline[6]/1000, tz=timezone.utc)),
+        "kline_close_time": str(datetime.fromtimestamp(int(kline[6])/1000, tz=timezone.utc)),
         "quote_asset_volume": float(kline[7]),
         "number_of_trades": int(kline[8]),
         "taker_buy_base_asset_volume": float(kline[9]),
         "taker_buy_quote_asset_volume": float(kline[10])
     }
+
 
 def format_historical_klines(msg):
     """Rewrites a list of klines into a more readable format.
@@ -98,4 +101,3 @@ def calculate_start_date(time_span, time_unit):
         return datetime.utcnow() - timedelta(minutes=time_span)
     elif time_unit == "h":
         return datetime.utcnow() - timedelta(hours=time_span)
-

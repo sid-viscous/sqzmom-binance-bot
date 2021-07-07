@@ -112,7 +112,7 @@ class Trader:
         if self.config.test_mode:
             self.fake_sell()
 
-    def handle_new_kline(self, candles):
+    def set_position(self, candles):
         """Main decision function for signalling.
 
         This function is called when a new candle comes in from the Bot class.
@@ -127,7 +127,7 @@ class Trader:
         self.candles = candles
 
         # Log current position
-        print("-----------------------------------------------------------------------------------------------")
+        print("--------------------------------------------------------")
         print(f"Checking strategy for position - current position: {self.position}")
 
         # Query the strategy for the current recommended position
