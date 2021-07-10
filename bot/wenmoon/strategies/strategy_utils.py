@@ -1,5 +1,39 @@
 import numpy as np
 
+
+def f_sma(close_prices, window):
+    """Calculates standard moving average SEMA).
+
+    This function takes historical data, and a moving window to calculate SMA.
+    As the moving average takes previous closing prices into account, its length will be len(klines) - window
+
+    Args:
+        lose_values (list of float): A list containing the closing values.
+        window (int): The moving window to take averages over.
+
+    Returns:
+        list of float: A list of SMAs
+    """
+
+    sma = []
+
+
+    # calculate SMA
+    # Smoothing factor
+    smooth = 2.0/(window + 1.0)
+
+    # Calculate first EMA from simple average
+    ema.append(sum(close_prices[:window])/window)
+
+    # Calculate remaining EMA values
+    i = 0
+    for close_price in close_prices[window:]:
+        new_ema = close_price*smooth + ema[-1]*(1.0-smooth)
+        ema.append(new_ema)
+        i += 1
+
+    return ema
+
 def f_ema(close_prices, window):
     """Calculates exponential moving average (EMA).
 

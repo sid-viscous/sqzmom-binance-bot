@@ -11,15 +11,15 @@ class Bot:
 
     Attributes:
         config: An instance of the configuration class, which should already be initialised.
-        websocket: An instance of the threaded websocket connection manager.
         binance_client: An instance of the binance client, used for getting historic data and submitting orders.
         candles (list of dict): The most recent list of closed historic candles.
         strategy (class): The class definition for the chosen strategy.
         newest_kline (dict): The most recent kline from the websocket.
+        symbol_info (dict): Information about the symbol being traded; rules, filters etc.
         trader (Trader): Instance of the trader class.
     """
 
-    def __init__(self, config, strategy):
+    def __init__(self, config, strategy, binance_client):
         """Initialise the bot.
 
         This class handles the connections to the binance API, including websockets for live data, and client for
@@ -34,25 +34,17 @@ class Bot:
         Args:
             config: An instance of the configuration class, which should already be initialised.
             strategy: A class definition for the strategy to be used.
+            binance_client: Instance of the Binance client, used for getting historical data and placing orders.
 
         """
         self.config = config
-        # self.websocket = self.init_kline_websocket()
-        # self.websocket_key = None
-        self.binance_client = None
+        self.binance_client = binance_client
         self.candles = None
         self.strategy = strategy
         self.newest_kline = None
+        self.symbol_info = None
         self.trader = Trader(config, strategy)
-        self.login()
         self.get_historical_klines()
-
-    def login(self):
-        """Logs into the binance client API using the supplied api key and secret."""
-        self.binance_client = Client(
-            self.config.api_key,
-            self.config.secret_key
-        )
 
     def get_historical_klines(self):
         """Gets the historic price kline data from the binance api.
