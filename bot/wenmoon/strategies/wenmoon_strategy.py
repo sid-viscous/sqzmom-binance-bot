@@ -35,7 +35,7 @@ class Strategy:
 
         # Get indicators
         macd_hist = f_macd(close_prices, MACD_WINDOW_SLOW, MACD_WINDOW_FAST, MACD_WINDOW_SIGNAL)
-        atr = f_atr(high_prices, low_prices, close_prices, ATR_WINDOW, ATR_MULTIPLIER)
+        atr = f_atr(high_prices, low_prices, close_prices, ATR_WINDOW) * ATR_MULTIPLIER
         ohlc4 = f_ohlc4(open_prices, high_prices, low_prices, close_prices, ATR_WINDOW)
 
         # Chandelier exit

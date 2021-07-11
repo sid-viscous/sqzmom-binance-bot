@@ -29,18 +29,21 @@ class Strategy:
         open_prices = get_kline_values_as_list(historical_klines, "open_price")
         high_prices = get_kline_values_as_list(historical_klines, "high_price")
         low_prices = get_kline_values_as_list(historical_klines, "low_price")
+        volumes = get_kline_values_as_list(historical_klines, "volume")
 
         # Get minimum ticker size
         min_tick_size = next(r for r in self.symbol_info["filters"] if r["filterType"] == "PRICE_FILTER")["tickSize"]
 
+        print(historical_klines)
 
 
-        # # Useful for dumping data into excel for testing
-        # print("+++++++++++++")
-        # print("Open High Low Close")
-        # for i in range(len(close_prices)):
-        #     print(f"{open_prices[i]} {high_prices[i]} {low_prices[i]} {close_prices[i]}")
-        # print("--------------")
+
+        # Useful for dumping data into excel for testing
+        print("+++++++++++++")
+        print("Open High Low Close Volume")
+        for i in range(len(close_prices)):
+            print(f"{open_prices[i]} {high_prices[i]} {low_prices[i]} {close_prices[i]} {volumes[i]}")
+        print("--------------")
         #
         # print("MACD_HIST")
         # for p in macd_hist:

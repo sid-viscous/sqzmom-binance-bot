@@ -10,7 +10,7 @@ class Trader:
             position (str): The current position for the strategy (options: "long", "short").
             coin_balance (float): The balance of coin currently trading.
             fiat_balance (float): The balance of fiat currency currently trading.
-            candles (list of dict): Candle data.
+            candles (list of dict): Candle data (candles[0] is the oldest).
         """
         self.config = config
         self.strategy = strategy
