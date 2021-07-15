@@ -17,6 +17,34 @@ def get_kline_values_as_list(candles, key):
 
     return result
 
+def get_heikin_ashi_candles(open_prices, high_prices, low_prices, close_prices):
+    """Converts regular candles to Heikin Ashi candles.
+
+    Args:
+        open_prices:
+        high_prices:
+        low_prices:
+        close_prices:
+
+    Returns:
+
+    """
+    open_ha = []
+    low_ha = []
+    high_ha = []
+    close_ha = []
+
+    for i in range(len(open_prices)):
+        close_ha.append(np.mean([open_prices[i], close_prices[i], low_prices[i], high_prices[i]]))
+        if i == 0:
+            open_ha.append(open_prices[i])
+        else:
+            open_ha.append(np.mean([open_ha[i-1], close_ha[i-1]]))
+        high_ha.append(max([high_prices[i], open_ha[i], close_ha[i]]))
+        low_ha.append(min([low_prices[i], open_ha[i], close_ha[i]]))
+
+    return open_ha, high_ha, low_ha, close_ha
+
 
 def k(candles, window):
     """Gets the most recent candles.
