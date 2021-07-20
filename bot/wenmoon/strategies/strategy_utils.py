@@ -105,7 +105,7 @@ def f_sma(close_prices, window):
     sma = []
     i = 0
     n = len(close_prices) - window + 1
-    print(f"n = {n}")
+
     for i in range(n):
         sma.append(sum(close_prices[i:i+window])/window)
         i += 1
@@ -335,7 +335,7 @@ def f_rsi(close_prices, window, mode="sma"):
             down_move.append(abs(change))
 
     # Get average upward and downward movements
-    if mode=="ema":
+    if mode == "ema":
         # Exponential moving average
         avg_up = f_ema(up_move, window)
         avg_down = f_ema(down_move, window)

@@ -7,7 +7,7 @@ from binance import Client
 
 from wenmoon.Config import Config
 from wenmoon.Bot import Bot
-from wenmoon.strategies.macd_ha_strategy import Strategy
+from wenmoon.strategies.rsi_simple_strategy import Strategy
 
 # Get configurations
 config = Config()
