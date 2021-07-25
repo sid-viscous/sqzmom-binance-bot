@@ -20,7 +20,9 @@ class Config:
             "start_position": "fiat",
             "max_candles": 50,
             "test_mode": "yes",
-            "strategy": "wenmoon"
+            "strategy": "wenmoon",
+            "profit_target": 0,
+            "stop_loss": 0
         }
 
         # Open configuration file
@@ -45,7 +47,9 @@ class Config:
         self.test_mode = config.getboolean(CONFIG_SECTION, "test_mode")
         self.test_fee = config.getfloat(CONFIG_SECTION, "test_fee")
         self.strategy = config.get(CONFIG_SECTION, "strategy")
-        self.output_klines = False
+        self.profit_target = config.getfloat(CONFIG_SECTION, "profit_target")
+        self.stop_loss = config.getfloat(CONFIG_SECTION, "stop_loss")
+        self.output_candles = False
         self.output_websocket = False
         self.run_mode = os.getenv("RUN_MODE", "python")
 

@@ -7,7 +7,7 @@ from binance import Client
 
 from wenmoon.Config import Config
 from wenmoon.Bot import Bot
-from wenmoon.strategies.rsi_simple_strategy import Strategy
+from wenmoon.strategies.macd_rsi_strategy import Strategy
 
 # Get configurations
 config = Config()
@@ -36,6 +36,7 @@ socket = f"wss://stream.binance.com:9443/ws/{config.watch_symbol_pair.lower()}@k
 
 # Disable full websocket logging
 websocket.enableTrace(False)
+
 
 def on_message(ws, message):
     """Called when the websocket receives a message.

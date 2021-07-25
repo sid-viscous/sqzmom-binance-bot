@@ -17,10 +17,10 @@ def format_websocket_result(msg):
     return {
         "event_type": msg["e"],
         "event_time_ms": msg["E"],
-        "event_time": datetime.fromtimestamp(msg["E"]/1000, tz=timezone.utc),
+        "event_time": str(datetime.fromtimestamp(msg["E"]/1000, tz=timezone.utc)),
         "symbol": msg["s"],
-        "kline_start_time": msg["k"]["t"],
-        "kline_close_time": msg["k"]["T"],
+        "candle_start_time": msg["k"]["t"],
+        "candle_close_time": msg["k"]["T"],
         "interval": msg["k"]["i"],
         "first_trade_id": msg["k"]["f"],
         "last_trade_id": msg["k"]["L"],
@@ -30,15 +30,15 @@ def format_websocket_result(msg):
         "low_price": float(msg["k"]["l"]),
         "volume": msg["k"]["v"],
         "number_of_trades": int(msg["k"]["n"]),
-        "is_kline_closed": msg["k"]["x"],
+        "is_candle_closed": msg["k"]["x"],
         "quote_asset_volume": float(msg["k"]["q"]),
         "taker_buy_base_asset_volume": float(msg["k"]["V"]),
         "taker_buy_quote_asset_volume": float(msg["k"]["Q"])
     }
 
 
-def format_historical_kline(kline):
-    """Rewrites a kline into a more readable format.
+def format_historical_candle(candle):
+    """Rewrites a candle into a more readable format.
 
     The documentation for the returned kline data at this endpoint (/api/v3/klines) can be found at the following link:
     https://github.com/binance/binance-public-data/#klines
@@ -50,23 +50,23 @@ def format_historical_kline(kline):
         dict: Human readable kline data.
     """
     return {
-        "kline_start_time_ms": int(kline[0]),
-        "kline_start_time": str(datetime.fromtimestamp(int(kline[0])/1000, tz=timezone.utc)),
-        "open_price": float(kline[1]),
-        "high_price": float(kline[2]),
-        "low_price": float(kline[3]),
-        "close_price": float(kline[4]),
-        "volume": float(kline[5]),
-        "kline_close_time_ms": int(kline[6]),
-        "kline_close_time": str(datetime.fromtimestamp(int(kline[6])/1000, tz=timezone.utc)),
-        "quote_asset_volume": float(kline[7]),
-        "number_of_trades": int(kline[8]),
-        "taker_buy_base_asset_volume": float(kline[9]),
-        "taker_buy_quote_asset_volume": float(kline[10])
+        "candle_start_time_ms": int(candle[0]),
+        "candle_start_time": str(datetime.fromtimestamp(int(candle[0])/1000, tz=timezone.utc)),
+        "open_price": float(candle[1]),
+        "high_price": float(candle[2]),
+        "low_price": float(candle[3]),
+        "close_price": float(candle[4]),
+        "volume": float(candle[5]),
+        "candle_close_time_ms": int(candle[6]),
+        "candle_close_time": str(datetime.fromtimestamp(int(candle[6])/1000, tz=timezone.utc)),
+        "quote_asset_volume": float(candle[7]),
+        "number_of_trades": int(candle[8]),
+        "taker_buy_base_asset_volume": float(candle[9]),
+        "taker_buy_quote_asset_volume": float(candle[10])
     }
 
 
-def format_historical_klines(msg):
+def format_historical_candles(msg):
     """Rewrites a list of klines into a more readable format.
 
     Args:
@@ -76,14 +76,14 @@ def format_historical_klines(msg):
         list of dict: Historical klines for the required period, with more verbose keys.
     """
     result = []
-    for kline in msg:
+    for candle in msg:
         # By default, the binance api returns candles that are still in progress, even if calling 1ms after next epoch
         # Check close time is not in the future
-        formatted_kline = format_historical_kline(kline)
-        close = datetime.fromtimestamp(formatted_kline["kline_close_time_ms"]/1000, tz=timezone.utc)
+        formatted_candle = format_historical_candle(candle)
+        close = datetime.fromtimestamp(formatted_candle["candle_close_time_ms"]/1000, tz=timezone.utc)
         now = datetime.now(tz=timezone.utc)
         if close < now:
-            result.append(formatted_kline)
+            result.append(formatted_candle)
     return result
 
 

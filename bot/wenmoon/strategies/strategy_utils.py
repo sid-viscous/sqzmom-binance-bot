@@ -1,15 +1,15 @@
 import numpy as np
 
 
-def get_kline_values_as_list(candles, key):
-    """Extracts all values from single key in a list of klines.
+def get_candle_values_as_list(candles, key):
+    """Extracts all values from single key in a list of candles.
 
     Args:
         candles (list of dict): Candles (human readable format).
         key (str): Key to extract from the list of Klines.
 
     Returns:
-        list: The extracted value from each of the klines.
+        list: The extracted value from each of the candles.
     """
     result = []
     for candle in candles:
@@ -93,7 +93,7 @@ def f_sma(close_prices, window):
     """Calculates standard moving average SMA).
 
     This function takes historical data, and a moving window to calculate SMA.
-    As the moving average takes previous closing prices into account, its length will be len(klines) - window
+    As the moving average takes previous closing prices into account, its length will be len(candles) - window
 
     Args:
         close_prices (list of float): A list of close prices for each period.
@@ -118,7 +118,7 @@ def f_ema(close_prices, window):
 
     This function takes historical data, and a moving window to calculate EMA.
     EMA differs from standard moving average with EMA placing a higher weight on more recent prices.
-    As the moving average takes previous closing prices into account, its length will be len(klines) - window
+    As the moving average takes previous closing prices into account, its length will be len(candles) - window
 
     Args:
         close_prices (list of float): A list of close prices for each period.
@@ -157,22 +157,23 @@ def f_macd(close_prices, window_slow, window_fast, window_signal):
         window_signal (int): The moving window to take averages over for the signal MACD period.
 
     Returns:
-        list of float: A list of MACDs
+        list of float: A list of MACD signals (< 0 if downtrend, > 0 if uptrend).
+        list of float:
     """
     # Get slow and fast EMA
     ema_slow = f_ema(close_prices, window_slow)
     ema_fast = f_ema(close_prices, window_fast)
 
     # Difference between slow and fast EMA
-    macd_diff = subtract(ema_fast, ema_slow)
+    macd_line = subtract(ema_fast, ema_slow)
 
     # MACD signal line
-    macd_signal = f_ema(macd_diff, window_signal)
+    macd_signal = f_ema(macd_line, window_signal)
 
-    # MACD history
-    macd_hist = subtract(macd_diff, macd_signal)
+    # MACD histogram
+    macd_histogram = subtract(macd_line, macd_signal)
 
-    return macd_hist
+    return macd_line, macd_signal, macd_histogram
 
 
 def f_atr(high_prices, low_prices, close_prices, window):

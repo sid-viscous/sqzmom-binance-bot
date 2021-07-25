@@ -1,7 +1,7 @@
 [binance_user_config]
 # Binance API credentials
-api_key=
-secret_key=
+api_key=L3lTRX4AgwTrJocjuantgF0c3bk52bwA8SxSe0lh2idRqbHIIHmeAaM6bQUB4bEt
+secret_key=2rirXaL5z2RBduKgNJ4TKTjh8EEJZA7Fg5od8A0ZnXtzjYn5rltdWdQ1JMOSWl4T
 # Coin to buy in a long position
 coin_symbol=BTC
 # Coin to buy in a short position
@@ -17,8 +17,12 @@ start_balance=100
 # Test mode (play with fake balance, no real purchases, options: yes, no)
 test_mode=yes
 # Trading fees for test mode in percentage (0.1 represents 0.1%)
-test_fees=0.1
+test_fee=0.075
 # Maximum number of candles to store
 max_candles=100
 # Strategy (options: wenmoon)
 strategy=wenmoon
+# Profit target (exit long position when profit is reached, expressed as a percentage)
+profit_target=0.5
+# Stop loss (exit long position when profit becomes too low for a trade, expressed as a positive percentage)
+stop_loss=-0.2

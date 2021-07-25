@@ -1,6 +1,6 @@
 import numpy
 
-from wenmoon.strategies.strategy_utils import f_ema, f_macd, f_atr, f_ohlc4, get_kline_values_as_list
+from wenmoon.strategies.strategy_utils import f_ema, f_macd, f_atr, f_ohlc4, get_candle_values_as_list
 
 # Strategy from https://kodify.net/tradingview/strategies/sma-crossover/
 
@@ -16,23 +16,23 @@ class Strategy:
         self.short_stop_prev = None
         self.symbol_info = symbol_info
 
-    def scout(self, historical_klines):
+    def scout(self, historical_candles):
         """Strategy function should be stored in scout function.
          It should return the string 'long' or 'short'.
          Strings have been used here in case future strategies have more positions.
 
         Args:
-            historical_klines (list of dict): Historical market klines (candles) for the selected trading symbol
+            historical_candles (list of dict): Historical market candles for the selected trading symbol
 
         Returns:
             string: The position chosen by the strategy (options: "long", "short", "neutral")
         """
         # Get required candles, EMA and MACD require close price, and ATR requires open, high, low, close prices
-        close_prices = get_kline_values_as_list(historical_klines, "close_price")
-        open_prices = get_kline_values_as_list(historical_klines, "open_price")
-        high_prices = get_kline_values_as_list(historical_klines, "high_price")
-        low_prices = get_kline_values_as_list(historical_klines, "low_price")
-        volumes = get_kline_values_as_list((historical_klines), "volume")
+        close_prices = get_candle_values_as_list(historical_candles, "close_price")
+        open_prices = get_candle_values_as_list(historical_candles, "open_price")
+        high_prices = get_candle_values_as_list(historical_candles, "high_price")
+        low_prices = get_candle_values_as_list(historical_candles, "low_price")
+        volumes = get_candle_values_as_list((historical_candles), "volume")
 
         # Get indicators
         source = close_prices
