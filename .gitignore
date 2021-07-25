@@ -135,3 +135,4 @@ bot/wenmoon/settings.cfg
 ./settings.cfg
 *.cfg
 playground/
+trades.csv

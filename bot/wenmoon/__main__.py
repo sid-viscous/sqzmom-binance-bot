@@ -3,28 +3,40 @@ import websocket
 import threading
 import time
 
+from binance import Client
+
 from wenmoon.Config import Config
 from wenmoon.Bot import Bot
-from wenmoon.strategies.wenmoon_strategy import Strategy
+from wenmoon.strategies.macd_rsi_strategy import Strategy
 
 # Get configurations
 config = Config()
 
+# Log into the binance client API using the supplied api key and secret
+binance_client = Client(
+    config.api_key,
+    config.secret_key
+)
+
+# Get symbol info
+symbol_info = binance_client.get_symbol_info(config.watch_symbol_pair)
+
 # Get the strategy to be used
 # strategy = get_strategy(config.strategy)
 
-strategy = Strategy()
+strategy = Strategy(symbol_info)
 # strategy.scout("1", "2")
 # print(strategy)
 
 # Initialise bot
-bot = Bot(config, strategy)
+bot = Bot(config, strategy, binance_client)
 
 # Set up the url for the required websocket stream (URL is case-sensitive)
 socket = f"wss://stream.binance.com:9443/ws/{config.watch_symbol_pair.lower()}@kline_{config.interval}"
 
 # Disable full websocket logging
 websocket.enableTrace(False)
+
 
 def on_message(ws, message):
     """Called when the websocket receives a message.
