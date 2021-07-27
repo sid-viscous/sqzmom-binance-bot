@@ -1,7 +1,7 @@
 [binance_user_config]
 # Binance API credentials
-api_key=L3lTRX4AgwTrJocjuantgF0c3bk52bwA8SxSe0lh2idRqbHIIHmeAaM6bQUB4bEt
-secret_key=2rirXaL5z2RBduKgNJ4TKTjh8EEJZA7Fg5od8A0ZnXtzjYn5rltdWdQ1JMOSWl4T
+api_key=
+secret_key=
 # Coin to buy in a long position
 coin_symbol=BTC
 # Coin to buy in a short position
