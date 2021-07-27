@@ -316,6 +316,7 @@ def f_rsi(close_prices, window, mode="sma"):
     Args:
         close_prices (list of float): A list of close prices for each period.
         window (int): The window / period to use in moving averages.
+        mode (str): Moving average mode ("ema" or "sma").
 
     Returns:
         list of float: RSI curve data.

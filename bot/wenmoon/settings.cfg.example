@@ -24,5 +24,5 @@ max_candles=100
 strategy=wenmoon
 # Profit target (exit long position when profit is reached, expressed as a percentage)
 profit_target=0.5
-# Stop loss (exit long position when profit becomes too low for a trade, expressed as a positive percentage)
+# Stop loss (exit long position when profit becomes too low for a trade, expressed as a negative percentage)
 stop_loss=-0.2

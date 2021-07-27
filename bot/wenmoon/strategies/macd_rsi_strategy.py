@@ -3,11 +3,11 @@ import os
 from wenmoon.strategies.strategy_utils import f_macd, f_rsi, get_candle_values_as_list
 
 # Parameters
-RSI_WINDOW = os.getenv("RSI_WINDOW", 14)
-FAST_WINDOW = os.getenv("FAST_WINDOW", 17)
-SLOW_WINDOW = os.getenv("SLOW_WINDOW", 37)
-SIGNAL_WINDOW = os.getenv("SIGNAL_WINDOW", 9)
-RSI_CUTOFF = os.getenv("RSI_CUTOFF", 35)
+RSI_WINDOW = int(os.getenv("RSI_WINDOW", 14))
+FAST_WINDOW = int(os.getenv("FAST_WINDOW", 17))
+SLOW_WINDOW = int(os.getenv("SLOW_WINDOW", 37))
+SIGNAL_WINDOW = int(os.getenv("SIGNAL_WINDOW", 9))
+RSI_CUTOFF = float(os.getenv("RSI_CUTOFF", 35))
 
 
 class Strategy:
@@ -49,6 +49,7 @@ class Strategy:
         volumes = get_candle_values_as_list(historical_candles, "volume")
 
         # Calculate rsi
+        print(RSI_WINDOW)
         rsi = f_rsi(close_prices, RSI_WINDOW)
 
         # Calculte MACD indicator
